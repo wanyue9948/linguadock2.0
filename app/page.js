@@ -1,101 +1,252 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ArrowLeftRight,
+  Github,
+  Linkedin,
+  RefreshCw,
+  Volume2,
+} from "lucide-react";
+// import { useToast } from "@/components/ui/use-toast";
+
+export default function Component() {
+  const [isTranslating, setIsTranslating] = React.useState(false);
+  const [isPlayingSource, setIsPlayingSource] = React.useState(false);
+  const [isPlayingTarget, setIsPlayingTarget] = React.useState(false);
+  const [sourceLang, setSourceLang] = React.useState("en");
+  const [targetLang, setTargetLang] = React.useState("cn");
+  const [sourceText, setSourceText] = React.useState("");
+  const [translatedText, setTranslatedText] = React.useState("");
+  // const { toast } = useToast();
+
+  const handleTranslate = async () => {
+    if (!sourceText.trim()) {
+      // toast({
+      //   title: "Error",
+      //   description: "Please enter some text to translate.",
+      //   variant: "destructive",
+      // });
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+      const response = await fetch("http://51.20.178.157:5000/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: sourceText,
+          sourceLang,
+          targetLang,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Translation failed");
+      }
+
+      const data = await response.json();
+      setTranslatedText(data.translated_text);
+    } catch (error) {
+      console.error("Translation error:", error);
+      // toast({
+      //   title: "Error",
+      //   description: "An error occurred during translation. Please try again.",
+      //   variant: "destructive",
+      // });
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const handleListen = (type) => {
+    if (type === "source") {
+      setIsPlayingSource(true);
+      // Simulate audio playback for source
+      setTimeout(() => setIsPlayingSource(false), 2000);
+    } else {
+      setIsPlayingTarget(true);
+      // Simulate audio playback for target
+      setTimeout(() => setIsPlayingTarget(false), 2000);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="container mx-auto p-4 space-y-6 max-w-5xl">
+      <header className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">LinguaDock</h1>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Github className="h-5 w-5" />
+              <span className="sr-only">GitHub</span>
+            </a>
+          </Button>
+          <Button variant="ghost" size="icon" asChild>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Linkedin className="h-5 w-5" />
+              <span className="sr-only">LinkedIn</span>
+            </a>
+          </Button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </header>
+
+      <Tabs defaultValue="translate" className="space-y-4">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="translate">Translation</TabsTrigger>
+          <TabsTrigger value="grammar">Grammar Analysis</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="translate" className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Select value={sourceLang} onValueChange={setSourceLang}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="cn">Chinese</SelectItem>
+                      <SelectItem value="es">Spanish</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const temp = sourceLang;
+                      setSourceLang(targetLang);
+                      setTargetLang(temp);
+                      setSourceText(translatedText);
+                      setTranslatedText(sourceText);
+                    }}
+                  >
+                    <ArrowLeftRight className="h-4 w-4" />
+                    <span className="sr-only">Swap languages</span>
+                  </Button>
+                  <Select value={targetLang} onValueChange={setTargetLang}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cn">Chinese</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="es">Spanish</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Textarea
+                  placeholder="Enter text to translate..."
+                  className="min-h-[200px] resize-none"
+                  value={sourceText}
+                  onChange={(e) => setSourceText(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => handleListen("source")}
+                    disabled={isPlayingSource}
+                  >
+                    <Volume2 className="h-4 w-4 mr-2" />
+                    {isPlayingSource ? "Playing..." : "Listen"}
+                  </Button>
+                  <Button onClick={handleTranslate} disabled={isTranslating}>
+                    <RefreshCw
+                      className={`h-4 w-4 mr-2 ${
+                        isTranslating ? "animate-spin" : ""
+                      }`}
+                    />
+                    {isTranslating ? "Translating..." : "Translate"}
+                  </Button>
+                  <Button variant="outline" onClick={() => setSourceText("")}>
+                    Clear
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Translation</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="min-h-[200px] rounded-md border bg-muted/50 p-4">
+                  <p className="text-sm">
+                    {translatedText || "Translation will appear here..."}
+                  </p>
+                </div>
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={() => handleListen("target")}
+                  disabled={isPlayingTarget}
+                >
+                  <Volume2 className="h-4 w-4 mr-2" />
+                  {isPlayingTarget ? "Playing..." : "Listen"}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="grammar" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Grammar Analysis</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                placeholder="Enter text for grammar analysis..."
+                className="min-h-[200px] resize-none"
+              />
+              <div className="flex items-center gap-4">
+                <Select defaultValue="english">
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Explain in" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="english">English</SelectItem>
+                    <SelectItem value="chinese">Chinese</SelectItem>
+                    <SelectItem value="spanish">Spanish</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button>Analyze</Button>
+                <Button variant="outline">Clear</Button>
+              </div>
+              <div className="rounded-md border bg-muted/50 p-4 min-h-[200px]">
+                <p className="text-sm text-muted-foreground">
+                  Grammar analysis will appear here...
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
